@@ -2,7 +2,6 @@
 
 Inventory and sales tracker for small shops. A shop owner manages products, records sales (stock drops automatically), and sees daily revenue, top sellers and low-stock warnings on a dashboard.
 
-**Live demo:** _add your Vercel link here_ (click "Try the demo shop" on the login page)
 
 ## Screenshots
 
@@ -65,44 +64,6 @@ flowchart LR
 
 **Time zones.** The browser sends its time zone, and the server groups sales by day in that zone, so a sale at 1 a.m. in Addis Ababa lands on the right day. Days with no sales are filled with 0 so charts have no gaps.
 
-## Project structure
-
-```
-shoptrack/
-  server/
-    src/
-      app.js            Express app: security, routes, error handling
-      index.js          Reads .env, connects to MongoDB, starts the server
-      seed.js           Demo data (SKUs, payments, transaction ids)
-      backfill.js       Upgrades databases created before the redesign
-      models/           User, Product, Sale
-      routes/           auth, products, sales, reports
-      utils/ids.js      SKU and transaction-id generators
-      middleware/auth.js  JWT check
-  client/
-    scripts/
-      screenshots.mjs   Generates the README screenshots from the demo shop
-    src/
-      pages/            Dashboard, Products (Inventory), NewSale (POS), Sales, AuthPage
-      components/       Layout, Sidebar, Topbar, NotificationBell, ProductForm, ui/ primitives, ...
-      context/          AuthContext, ThemeContext, AlertsContext
-      lib/              Formatting helpers, payment/status colours, chart palettes
-      api.js            One place for all server calls
-```
-
-## API
-
-All routes except register and login need `Authorization: Bearer <token>`.
-
-| Method | Route | Purpose |
-|---|---|---|
-| POST | `/api/auth/register`, `/api/auth/login` | Create account, log in |
-| GET | `/api/auth/me` | Current user |
-| GET, POST | `/api/products` | List (search by name/SKU, category, lowStock filters), create (SKU optional) |
-| GET | `/api/products/low-stock` | Low-stock items and count for the sidebar badge and bell |
-| PUT, DELETE | `/api/products/:id` | Update, delete |
-| GET, POST | `/api/sales` | History (from, to), record a sale with `paymentMethod` |
-| GET | `/api/reports/summary` | Dashboard numbers (days, tz), including today and yesterday |
 
 ## Run locally
 
@@ -134,15 +95,6 @@ npm run dev               # http://localhost:5173
 | client | `VITE_API_URL` | Deployed API address ending in `/api` (not needed locally) |
 | client | `VITE_DEMO` | `true` shows the "Try the demo shop" button |
 
-## Deploy
-
-1. **Database:** MongoDB Atlas, with Network Access set to allow `0.0.0.0/0` (Render's free plan has no fixed IP).
-2. **API on Render:** New Web Service from this repo, root directory `server`, build command `npm install`, start command `npm start`. Set `MONGODB_URI`, `JWT_SECRET` and `CLIENT_URL`.
-3. **Client on Vercel:** import this repo, root directory `client`, framework Vite. Set `VITE_API_URL` to `https://<your-render-app>.onrender.com/api` and `VITE_DEMO` to `true`.
-4. Put the Vercel address into `CLIENT_URL` on Render and redeploy the API.
-5. Run `npm run seed` once with `MONGODB_URI` pointing at your Atlas database to create the demo account.
-
-The free Render plan sleeps when idle, so the first request after a break can take about 30 seconds. The app shows a "server is waking up" message while it waits.
 
 ## Possible improvements
 
